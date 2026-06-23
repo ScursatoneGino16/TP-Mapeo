@@ -62,7 +62,8 @@ public class Main {
                                     .setParameter("nombre", "Provincia de Demo ORM")
                                     .uniqueResult();
 
-                                if (nuevaProvincia == null) {
+                                if (nuevaProvincia == null) 
+                                {
                                     nuevaProvincia = new Provincia("Provincia de Demo ORM");
                                     session.persist(nuevaProvincia);
                                 }
