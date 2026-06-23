@@ -1,0 +1,52 @@
+networks:
+  net:
+    external: false
+
+volumes:
+  postgres-db:
+    external: false
+
+secrets:
+  db-password:
+    file: password.txt
+
+services:
+  db:
+    image: postgres:alpine
+    restart: unless-stopped
+    env_file:
+      - .env.db
+    # secrets:
+    #   - db-password
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+    volumes:    
+    #  - ./pg_hba.conf:/var/lib/postgresql/data/18/docker/pg_hba.conf
+    #  - ./postgresql.conf:/var/lib/postgresql/data/18/docker/postgresql.conf
+    #  - ./data:/var/lib/postgresql
+    #  - postgres-db:/var/lib/postgresql
+      - ./initdb:/docker-entrypoint-initdb.d
+      - ./csv:/csv
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c max_connections=200
+    ports:
+      - 5433:5432
+    networks:
+      - net
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env.db
+  #   # secrets:
+  #   #   - db-password
+  #   ports:
+  #     - 80:80
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - net
